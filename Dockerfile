@@ -372,7 +372,7 @@ RUN cd /usr/src && \
 #### Add USB Dongle support
 RUN git clone https://github.com/Shayennn/asterisk-chan-dongle /usr/src/asterisk-chan-dongle && \
     cd /usr/src/asterisk-chan-dongle && \
-    git checkout 2d5d7ff1c25365a5327346458d7d6edb12e7e735 && \
+    git checkout 523bd9b4f4e589a7cbf1580e5f7a6b587e08cc71 && \
     ./bootstrap && \
     ./configure --with-astversion=$ASTERISK_VERSION && \
     make && \
