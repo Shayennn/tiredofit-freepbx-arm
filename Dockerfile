@@ -110,7 +110,7 @@ LABEL maintainer="Dave Conroy (dave at tiredofit dot ca)"
 ### Set defaults
 ENV ASTERISK_VERSION=17.9.3 \
     BCG729_VERSION=1.0.4 \
-    DONGLE_VERSION=fa218fff5d9cb5b73fa58d0bce6dbc1036d394ca \
+    DONGLE_VERSION=2873014ecdf607b4a1f6fea257626170dcb8873e \
     G72X_CPUHOST=penryn \
     G72X_VERSION=0.1 \
     MONGODB_VERSION=4.2 \
