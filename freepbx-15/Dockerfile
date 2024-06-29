@@ -4,7 +4,7 @@ LABEL maintainer="Dave Conroy (dave at tiredofit dot ca)"
 ### Set defaults
 ENV ASTERISK_VERSION=17.6.0 \
     BCG729_VERSION=1.0.4 \
-    DONGLE_VERSION=20200610 \
+    DONGLE_VERSION=fa218fff5d9cb5b73fa58d0bce6dbc1036d394ca \
     G72X_CPUHOST=penryn \
     G72X_VERSION=0.1 \
     MONGODB_VERSION=4.2 \
@@ -246,9 +246,9 @@ RUN echo "Package: libxml2*" > /etc/apt/preferences.d/libxml2 && \
     make install && \
     \
 #### Add USB Dongle support
-    git clone https://github.com/rusxakep/asterisk-chan-dongle /usr/src/asterisk-chan-dongle && \
+    git clone https://github.com/Shayennn/asterisk-chan-dongle /usr/src/asterisk-chan-dongle && \
     cd /usr/src/asterisk-chan-dongle && \
-    git checkout tags/$DONGLE_VERSION && \
+    git checkout $DONGLE_VERSION && \
     ./bootstrap && \
     ./configure --with-astversion=$ASTERISK_VERSION && \
     make && \

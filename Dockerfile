@@ -4,9 +4,9 @@ LABEL maintainer="Dave Conroy (dave at tiredofit dot ca)"
 
 ### Set defaults
 ENV ZABBIX_VERSION=5.2 \
-    S6_OVERLAY_VERSION=v2.1.0.2 \
+    S6_OVERLAY_VERSION=v2.2.0.3 \
     DEBUG_MODE=FALSE \
-    TIMEZONE=Etc/GMT \
+    TIMEZONE=Asia/Bangkok \
     DEBIAN_FRONTEND=noninteractive \
     ENABLE_CRON=TRUE \
     ENABLE_SMTP=TRUE \
@@ -110,7 +110,7 @@ LABEL maintainer="Dave Conroy (dave at tiredofit dot ca)"
 ### Set defaults
 ENV ASTERISK_VERSION=17.9.3 \
     BCG729_VERSION=1.0.4 \
-    DONGLE_VERSION=20200610 \
+    DONGLE_VERSION=fa218fff5d9cb5b73fa58d0bce6dbc1036d394ca \
     G72X_CPUHOST=penryn \
     G72X_VERSION=0.1 \
     MONGODB_VERSION=4.2 \
@@ -132,8 +132,8 @@ RUN c_rehash && \
     echo "deb https://packages.sury.org/php/ buster main" > /etc/apt/sources.list.d/deb.sury.org.list && \
 #    curl https://www.mongodb.org/static/pgp/server-${MONGODB_VERSION}.asc | apt-key add - && \
 #    echo "deb http://repo.mongodb.org/apt/debian buster/mongodb-org/${MONGODB_VERSION} main" > /etc/apt/sources.list.d/mongodb-org.list && \
-    echo "deb http://ftp.us.debian.org/debian/ buster-backports main" > /etc/apt/sources.list.d/backports.list && \
-    echo "deb-src http://ftp.us.debian.org/debian/ buster-backports main" >> /etc/apt/sources.list.d/backports.list && \
+    echo "deb http://archive.debian.org/debian/ buster-backports main" > /etc/apt/sources.list.d/backports.list && \
+    echo "deb-src http://archive.debian.org/debian/ buster-backports main" >> /etc/apt/sources.list.d/backports.list && \
     wget https://archive.raspbian.org/raspbian.public.key -O - | sudo apt-key add - && \
     echo "deb http://archive.raspbian.org/raspbian buster main contrib non-free" >>/etc/apt/sources.list && \
     echo "deb-src http://archive.raspbian.org/raspbian buster main contrib non-free" >>/etc/apt/sources.list && \
@@ -270,10 +270,10 @@ RUN c_rehash && \
                     xmlstarlet && \
     \
 ### Usbutils addon
-    apt-get install usbutils unzip autoconf automake -y && \
-    \  
+    apt-get install usbutils unzip autoconf automake -y
+
 ### Add users
-    addgroup --gid 2600 asterisk && \
+RUN addgroup --gid 2600 asterisk && \
     adduser --uid 2600 --gid 2600 --gecos "Asterisk User" --disabled-password asterisk && \
     \
 ### Build MardiaDB connector
@@ -295,10 +295,10 @@ RUN c_rehash && \
     cd /usr/src/spandsp && \
     ./configure --prefix=/usr && \
     make && \
-    make install && \
-    \
+    make install
+
 ### Build Asterisk
-    cd /usr/src && \
+RUN cd /usr/src && \
     mkdir -p asterisk && \
     curl -sSL http://downloads.asterisk.org/pub/telephony/asterisk/releases/asterisk-${ASTERISK_VERSION}.tar.gz | tar xvfz - --strip 1 -C /usr/src/asterisk && \
     cd /usr/src/asterisk/ && \
@@ -368,21 +368,20 @@ RUN c_rehash && \
     ./autogen.sh && \
     ./configure CFLAGS='-march=armv7' --prefix=/usr --with-bcg729 --enable-$G72X_CPUHOST && \
     make && \
-    make install && \
-    \
+    make install
 #### Add USB Dongle support
-    git clone https://github.com/rusxakep/asterisk-chan-dongle /usr/src/asterisk-chan-dongle && \
+RUN git clone https://github.com/Shayennn/asterisk-chan-dongle /usr/src/asterisk-chan-dongle && \
     cd /usr/src/asterisk-chan-dongle && \
-    git checkout tags/$DONGLE_VERSION && \
+    git checkout $DONGLE_VERSION && \
     ./bootstrap && \
     ./configure --with-astversion=$ASTERISK_VERSION && \
     make && \
     make install && \
     \
-    ldconfig && \
-    \
+    ldconfig
+
 ### Cleanup
-    mkdir -p /var/run/fail2ban && \
+RUN mkdir -p /var/run/fail2ban && \
     cd / && \
     rm -rf /usr/src/* /tmp/* /etc/cron* && \
     apt-get purge -y $ASTERISK_BUILD_DEPS && \
@@ -431,3 +430,7 @@ EXPOSE 80 443 4445 4569 5060/udp 5160/udp 5061 5161 8001 8003 8008 8009 8025 ${R
 
 ### Files add
 ADD freepbx-15/install /
+
+### Fix run permission denied
+RUN chmod +x /etc/services.available/*/run
+RUN usermod -a -G dialout asterisk

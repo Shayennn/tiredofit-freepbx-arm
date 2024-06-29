@@ -369,6 +369,7 @@ if [ ! -f "/usr/sbin/fwconsole" ]; then
   exit 1
 fi
 
+chmod 666 /dev/ttyUSB*
 chown -RH asterisk. /etc/asterisk
 chown asterisk. /etc/amportal.conf
 
