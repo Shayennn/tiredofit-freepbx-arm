@@ -144,6 +144,7 @@ RUN c_rehash && \
     ASTERISK_BUILD_DEPS='\
                         autoconf \
                         automake \
+                        bluez-utils \
                         bison \
                         binutils-dev \
                         build-essential \
