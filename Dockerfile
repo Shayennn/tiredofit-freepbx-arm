@@ -114,7 +114,7 @@ ENV ASTERISK_VERSION=17.9.3 \
     G72X_CPUHOST=penryn \
     G72X_VERSION=0.1 \
     MONGODB_VERSION=4.2 \
-    PHP_VERSION=5.6 \
+    PHP_VERSION=5.6.40 \
     SPANDSP_VERSION=20180108 \
     RTP_START=18000 \
     RTP_FINISH=20000
@@ -128,8 +128,8 @@ RUN c_rehash && \
     \
 ### Install dependencies
     set -x && \
-    curl https://packages.sury.org/php/apt.gpg | apt-key add - && \
-    echo "deb https://packages.sury.org/php/ buster main" > /etc/apt/sources.list.d/deb.sury.org.list && \
+    # curl https://packages.sury.org/php/apt.gpg | apt-key add - && \
+    # echo "deb https://packages.sury.org/php/ buster main" > /etc/apt/sources.list.d/deb.sury.org.list && \
 #    curl https://www.mongodb.org/static/pgp/server-${MONGODB_VERSION}.asc | apt-key add - && \
 #    echo "deb http://repo.mongodb.org/apt/debian buster/mongodb-org/${MONGODB_VERSION} main" > /etc/apt/sources.list.d/mongodb-org.list && \
     echo "deb http://archive.debian.org/debian/ buster-backports main" > /etc/apt/sources.list.d/backports.list && \
@@ -243,21 +243,22 @@ RUN c_rehash && \
                     mariadb-server \
                     mongodb \
                     mpg123 \
-                    php${PHP_VERSION} \
-                    php${PHP_VERSION}-curl \
-                    php${PHP_VERSION}-cli \
-                    php${PHP_VERSION}-mysql \
-                    php${PHP_VERSION}-gd \
-                    php${PHP_VERSION}-mbstring \
-                    php${PHP_VERSION}-intl \
-                    php${PHP_VERSION}-bcmath \
-                    php${PHP_VERSION}-ldap \
-                    php${PHP_VERSION}-xml \
-                    php${PHP_VERSION}-zip \
-                    php${PHP_VERSION}-sqlite3 \
-                    php-pear \
+                    # php${PHP_VERSION} \
+                    # php${PHP_VERSION}-curl \
+                    # php${PHP_VERSION}-cli \
+                    # php${PHP_VERSION}-mysql \
+                    # php${PHP_VERSION}-gd \
+                    # php${PHP_VERSION}-mbstring \
+                    # php${PHP_VERSION}-intl \
+                    # php${PHP_VERSION}-bcmath \
+                    # php${PHP_VERSION}-ldap \
+                    # php${PHP_VERSION}-xml \
+                    # php${PHP_VERSION}-zip \
+                    # php${PHP_VERSION}-sqlite3 \
+                    # php-pear \
                     pkg-config \
-                    sipsak \
+                    re2c \
+    sipsak \
                     sngrep \
                     socat \
                     sox \
@@ -280,9 +281,8 @@ RUN addgroup --gid 2600 asterisk && \
 ### Build MardiaDB connector
     apt-get install -y cmake gcc && \
     cd /usr/src && \
-    git clone https://github.com/MariaDB/mariadb-connector-odbc.git && \
+    git clone https://github.com/MariaDB/mariadb-connector-odbc.git --depth 1 --branch 3.1.1-ga && \
     cd mariadb-connector-odbc && \
-    git checkout tags/3.1.1-ga && \
     mkdir build && \
     cd build && \
     cmake ../ -LH -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local -DWITH_SSL=OPENSSL\
@@ -296,6 +296,80 @@ RUN addgroup --gid 2600 asterisk && \
     cd /usr/src/spandsp && \
     ./configure --prefix=/usr && \
     make && \
+    make install
+
+
+RUN cd /usr/src && \
+    git clone https://github.com/php/php-src.git --depth 1 --branch php-${PHP_VERSION} && \
+    cd php-src && \
+    apt install -y libxml2-dev && \
+    ./buildconf --force && \
+    ./configure --prefix=/usr \
+        --with-config-file-path=/etc/php/${PHP_VERSION}/apache2 \
+        --with-config-file-scan-dir=/etc/php/${PHP_VERSION}/apache2/conf.d \
+        --enable-mbstring \
+        --enable-zip \
+        --enable-bcmath \
+        --enable-pcntl \
+        --enable-ftp \
+        --enable-exif \
+        --enable-calendar \
+        --enable-sysvmsg \
+        --enable-sysvsem \
+        --enable-sysvshm \
+        --enable-wddx \
+        --with-curl \
+        --with-mcrypt \
+        --with-iconv \
+        --with-gmp \
+        --with-pspell \
+        --with-gd \
+        --with-jpeg-dir=/usr \
+        --with-png-dir=/usr \
+        --with-zlib-dir=/usr \
+        --with-xpm-dir=/usr \
+        --with-freetype-dir=/usr \
+        --with-t1lib=/usr \
+        --enable-gd-native-ttf \
+        --enable-gd-jis-conv \
+        --with-openssl \
+        --with-mhash \
+        --enable-pdo \
+        --with-pdo-mysql \
+        --with-gettext \
+        --with-zlib \
+        --with-bz2 \
+        --with-recode \
+        --enable-soap \
+        --with-xmlrpc \
+        --with-tidy \
+        --with-mysqli \
+        --with-mysql-sock=/var/run/mysqld/mysqld.sock \
+        --with-pear \
+        --enable-sockets \
+        --enable-shmop \
+        --enable-mbregex \
+        --with-mysqli=mysqlnd \
+        --with-pdo-mysql=mysqlnd \
+        --enable-embedded-mysqli \
+        --with-iodbc \
+        --with-ldap \
+        --with-ldap-sasl \
+        --with-mssql \
+        --with-oci8 \
+        --with-oci8-11g \
+        --with-pdo-oci \
+        --with-pdo-dblib \
+        --with-pgsql \
+        --with-snmp \
+        --with-sqlite3 \
+        --with-pdo-sqlite \
+        --with-xsl \
+        --with-zip \
+        --with-kerberos \
+        --with-vpx-dir=/usr \
+        --with-c &&\
+    make -j $(nproc) && \
     make install
 
 ### Build Asterisk
@@ -355,9 +429,8 @@ RUN cd /usr/src && \
     make config && \
     \
 #### Add G729 codecs
-    git clone https://github.com/BelledonneCommunications/bcg729 /usr/src/bcg729 && \
+    git clone https://github.com/BelledonneCommunications/bcg729 /usr/src/bcg729 --depth 1 --branch $BCG729_VERSION && \
     cd /usr/src/bcg729 && \
-    git checkout tags/$BCG729_VERSION && \
     ./autogen.sh && \
     ./configure --prefix=/usr --libdir=/lib && \
     make && \
@@ -371,9 +444,8 @@ RUN cd /usr/src && \
     make && \
     make install
 #### Add USB Dongle support
-RUN git clone https://github.com/Shayennn/asterisk-chan-dongle /usr/src/asterisk-chan-dongle && \
+RUN git clone https://github.com/Shayennn/asterisk-chan-dongle /usr/src/asterisk-chan-dongle --depth 1 --branch 36bb7b0b1d917ae605c4a77fee7de2934bbb880a && \
     cd /usr/src/asterisk-chan-dongle && \
-    git checkout 36bb7b0b1d917ae605c4a77fee7de2934bbb880a && \
     ./bootstrap && \
     ./configure --with-astversion=$ASTERISK_VERSION && \
     make && \
