@@ -1,0 +1,12 @@
+#!/usr/bin/with-contenv bash
+
+source /assets/functions/00-container
+prepare_service single
+
+### Check to see if enabled/disabled
+if var_true "$ENABLE_BLUETOOTH" ;  then
+  service dbus start
+  bluetoothd &
+fi
+
+liftoff

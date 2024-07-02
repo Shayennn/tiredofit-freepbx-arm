@@ -96,7 +96,7 @@ RUN echo "Package: libxml2*" > /etc/apt/preferences.d/libxml2 && \
     apt-get install --no-install-recommends -y \
                     $ASTERISK_BUILD_DEPS \
                     apache2 \
-                    bluez-utils \
+                    bluez \
                     composer \
                     fail2ban \
                     ffmpeg \
