@@ -243,6 +243,7 @@ RUN c_rehash && \
                     mariadb-server \
                     mongodb \
                     mpg123 \
+                    patch \
                     # php${PHP_VERSION} \
                     # php${PHP_VERSION}-curl \
                     # php${PHP_VERSION}-cli \
@@ -258,7 +259,7 @@ RUN c_rehash && \
                     # php-pear \
                     pkg-config \
                     re2c \
-    sipsak \
+                    sipsak \
                     sngrep \
                     socat \
                     sox \
@@ -298,10 +299,14 @@ RUN addgroup --gid 2600 asterisk && \
     make && \
     make install
 
+ADD https://git.archlinux.org/svntogit/packages.git/plain/trunk/freetype.patch?h=packages/php /tmp/freetype.patch
+
 
 RUN cd /usr/src && \
     git clone https://github.com/php/php-src.git --depth 1 --branch php-${PHP_VERSION} && \
     cd php-src && \
+    patch -p1 -i /tmp/freetype.patch && \
+    rm -f /tmp/freetype.patch && \
     apt install -y libxml2-dev libbz2-dev libcurl4-openssl-dev libjpeg-dev libpng-dev libxpm-dev libfreetype6-dev libgmp-dev libldap2-dev libmcrypt-dev libmhash-dev unixodbc-dev libpspell-dev libsnmp-dev libtidy-dev libxslt1-dev libzip-dev libvpx-dev && \
     ln -s /usr/include/$(dpkg-architecture -qDEB_HOST_MULTIARCH)/curl /usr/include/curl && \
     ./buildconf --force && \
