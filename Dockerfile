@@ -302,7 +302,7 @@ RUN addgroup --gid 2600 asterisk && \
 RUN cd /usr/src && \
     git clone https://github.com/php/php-src.git --depth 1 --branch php-${PHP_VERSION} && \
     cd php-src && \
-    apt install -y libxml2-dev libbz2-dev libcurl4-openssl-dev libjpeg-dev libpng-dev libxpm-dev libfreetype6-dev libgmp-dev libldap2-dev libmcrypt-dev libmhash-dev unixodbc-dev libpspell-dev libsnmp-dev libtidy-dev libxslt1-dev libzip-dev && \
+    apt install -y libxml2-dev libbz2-dev libcurl4-openssl-dev libjpeg-dev libpng-dev libxpm-dev libfreetype6-dev libgmp-dev libldap2-dev libmcrypt-dev libmhash-dev unixodbc-dev libpspell-dev libsnmp-dev libtidy-dev libxslt1-dev libzip-dev libvpx-dev && \
     ln -s /usr/include/$(dpkg-architecture -qDEB_HOST_MULTIARCH)/curl /usr/include/curl && \
     ./buildconf --force && \
     ./configure --prefix=/usr \
