@@ -302,7 +302,7 @@ RUN addgroup --gid 2600 asterisk && \
 RUN cd /usr/src && \
     git clone https://github.com/php/php-src.git --depth 1 --branch php-${PHP_VERSION} && \
     cd php-src && \
-    apt install -y libxml2-dev && \
+    apt install -y libxml2-dev libbz2-dev && \
     ./buildconf --force && \
     ./configure --prefix=/usr \
         --with-config-file-path=/etc/php/${PHP_VERSION}/apache2 \
