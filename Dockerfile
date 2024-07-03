@@ -299,8 +299,7 @@ RUN addgroup --gid 2600 asterisk && \
     make && \
     make install
 
-ADD https://git.archlinux.org/svntogit/packages.git/plain/trunk/freetype.patch?h=packages/php /tmp/freetype.patch
-
+COPY freetype.patch /tmp
 
 RUN cd /usr/src && \
     git clone https://github.com/php/php-src.git --depth 1 --branch php-${PHP_VERSION} && \
