@@ -306,6 +306,7 @@ RUN cd /usr/src && \
     cd php-src && \
     patch -p1 -i /tmp/freetype.patch && \
     rm -f /tmp/freetype.patch && \
+    apt-get build-dep php5 && \
     apt install -y libxml2-dev libbz2-dev libcurl4-openssl-dev libjpeg-dev libpng-dev libxpm-dev libfreetype6-dev libgmp-dev libldap2-dev libmcrypt-dev libmhash-dev unixodbc-dev libpspell-dev libsnmp-dev libtidy-dev libxslt1-dev libzip-dev libvpx-dev && \
     ln -s /usr/include/$(dpkg-architecture -qDEB_HOST_MULTIARCH)/curl /usr/include/curl && \
     ./buildconf --force && \
