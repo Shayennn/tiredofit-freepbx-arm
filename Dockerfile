@@ -311,6 +311,8 @@ RUN cd /usr/src && \
     ln -s /usr/include/$(dpkg-architecture -qDEB_HOST_MULTIARCH)/gmp.h /usr/include/gmp.h && \
     ln -s /usr/lib/$(dpkg-architecture -qDEB_HOST_MULTIARCH)/libldap.so /usr/lib/libldap.so && \
     ln -s /usr/lib/$(dpkg-architecture -qDEB_HOST_MULTIARCH)/liblber.so /usr/lib/liblber.so && \
+    # obdc fix
+    ln -s /usr/lib/$(dpkg-architecture -qDEB_HOST_MULTIARCH)/libodbc.so /usr/lib/libodbc.so && \
     ./buildconf --force && \
     ./configure --prefix=/usr \
         --with-config-file-path=/etc/php/${PHP_VERSION}/apache2 \
