@@ -362,7 +362,6 @@ RUN cd /usr/src && \
         --with-mysqli=mysqlnd \
         --with-pdo-mysql=mysqlnd \
         --enable-embedded-mysqli \
-        --with-iodbc \
         --with-ldap \
         --with-ldap-sasl \
         --with-pdo-dblib \
