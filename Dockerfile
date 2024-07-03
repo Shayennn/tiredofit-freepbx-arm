@@ -363,9 +363,6 @@ RUN cd /usr/src && \
         --with-iodbc \
         --with-ldap \
         --with-ldap-sasl \
-        --with-oci8 \
-        --with-oci8-11g \
-        --with-pdo-oci \
         --with-pdo-dblib \
         --with-snmp \
         --with-sqlite3 \
