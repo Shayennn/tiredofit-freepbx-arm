@@ -364,7 +364,6 @@ RUN cd /usr/src && \
         --enable-embedded-mysqli \
         --with-ldap \
         --with-ldap-sasl \
-        --with-pdo-dblib \
         --with-snmp \
         --with-sqlite3 \
         --with-pdo-sqlite \
