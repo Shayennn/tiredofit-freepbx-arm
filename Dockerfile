@@ -371,7 +371,8 @@ RUN cd /usr/src && \
         --with-zip \
         --with-kerberos \
         --with-vpx-dir=/usr \
-        --with-c &&\
+        --with-c \
+        --enable-opcache=no && \
     make -j $(nproc) && \
     make install
 
