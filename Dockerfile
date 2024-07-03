@@ -306,9 +306,11 @@ RUN cd /usr/src && \
     cd php-src && \
     patch -p1 -i /tmp/freetype.patch && \
     rm -f /tmp/freetype.patch && \
-    apt install -y libxml2-dev libgmp-dev libbz2-dev libt1-dev libcurl4-openssl-dev libjpeg-dev libpng-dev libxpm-dev libfreetype6-dev libgmp-dev libldap2-dev libmcrypt-dev libmhash-dev unixodbc-dev libpspell-dev libsnmp-dev libtidy-dev libxslt1-dev libzip-dev libvpx-dev && \
+    apt install -y libldb-dev libldap2-dev libxml2-dev libgmp-dev libbz2-dev libt1-dev libcurl4-openssl-dev libjpeg-dev libpng-dev libxpm-dev libfreetype6-dev libgmp-dev libldap2-dev libmcrypt-dev libmhash-dev unixodbc-dev libpspell-dev libsnmp-dev libtidy-dev libxslt1-dev libzip-dev libvpx-dev && \
     ln -s /usr/include/$(dpkg-architecture -qDEB_HOST_MULTIARCH)/curl /usr/include/curl && \
     ln -s /usr/include/$(dpkg-architecture -qDEB_HOST_MULTIARCH)/gmp.h /usr/include/gmp.h && \
+    ln -s /usr/lib/$(dpkg-architecture -qDEB_HOST_MULTIARCH)/libldap.so /usr/lib/libldap.so && \
+    ln -s /usr/lib/$(dpkg-architecture -qDEB_HOST_MULTIARCH)/liblber.so /usr/lib/liblber.so && \
     ./buildconf --force && \
     ./configure --prefix=/usr \
         --with-config-file-path=/etc/php/${PHP_VERSION}/apache2 \
