@@ -448,13 +448,16 @@ RUN cd /usr/src && \
     make && \
     make install
 #### Add USB Dongle support
-RUN git clone https://github.com/Shayennn/asterisk-chan-dongle /usr/src/asterisk-chan-dongle --depth 1 --branch 36bb7b0b1d917ae605c4a77fee7de2934bbb880a && \
+RUN mkdir -p /usr/src/asterisk-chan-dongle && \
     cd /usr/src/asterisk-chan-dongle && \
+    git init && \
+    git remote add origin https://github.com/Shayennn/asterisk-chan-dongle && \
+    git fetch --depth 1 origin 36bb7b0b1d917ae605c4a77fee7de2934bbb880a && \
+    git checkout FETCH_HEAD && \
     ./bootstrap && \
     ./configure --with-astversion=$ASTERISK_VERSION && \
     make && \
     make install && \
-    \
     ldconfig
 
 ### Cleanup
