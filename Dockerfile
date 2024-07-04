@@ -1,5 +1,4 @@
-###https://github.com/tiredofit/docker-debian/tree/buster
-FROM php:5.6-apache AS epandi-debian-buster
+FROM php:5.6-apache-stretch AS epandi-debian-stretch
 
 ### Set defaults
 ENV ZABBIX_VERSION=5.2 \
@@ -10,7 +9,11 @@ ENV ZABBIX_VERSION=5.2 \
     ENABLE_CRON=TRUE \
     ENABLE_SMTP=TRUE \
     ENABLE_ZABBIX=TRUE \
-    ZABBIX_HOSTNAME=debian.buster
+    ZABBIX_HOSTNAME=debian.stretch
+
+### Fix Err:10 http://security.debian.org/debian-security stretch/updates/main amd64 Packages
+### By remove http://security.debian.org/debian-security
+RUN sed -i '/security.debian.org/d' /etc/apt/sources.list
 
 ### Dependencies addon
 RUN set -x && \
@@ -65,7 +68,7 @@ RUN set -x && \
 EXPOSE 1025 8025 10050/TCP
 
 ### Add folders
-ADD debian-buster/install /
+ADD debian-stretch/install /
 
 ### Entrypoint configuration
 ENTRYPOINT ["/init"]
@@ -73,7 +76,7 @@ ENTRYPOINT ["/init"]
 
 
 ###https://github.com/tiredofit/docker-nodejs/tree/10/debian
-FROM epandi-debian-buster AS epandi-nodejs-10-debian-latest
+FROM epandi-debian-stretch AS epandi-nodejs-10-debian-latest
 LABEL maintainer="Dave Conroy (dave at tiredofit dot ca)"
 
 ### Environment variables
@@ -85,8 +88,8 @@ RUN adduser --home /app --gecos "Node User" --disabled-password nodejs && \
 \
 ### Install NodeJS
     wget --no-check-certificate -qO - https://deb.nodesource.com/gpgkey/nodesource.gpg.key | apt-key add - && \
-    echo 'deb https://deb.nodesource.com/node_10.x buster main' > /etc/apt/sources.list.d/nodesource.list && \
-    echo 'deb-src https://deb.nodesource.com/node_10.x buster main' >> /etc/apt/sources.list.d/nodesource.list && \
+    echo 'deb https://deb.nodesource.com/node_10.x stretch main' > /etc/apt/sources.list.d/nodesource.list && \
+    echo 'deb-src https://deb.nodesource.com/node_10.x stretch main' >> /etc/apt/sources.list.d/nodesource.list && \
     apt-get update && \
     apt-get install -y \
             nodejs \
@@ -99,7 +102,7 @@ RUN adduser --home /app --gecos "Node User" --disabled-password nodejs && \
 
 
 
-FROM epandi-nodejs-10-debian-latest AS epandi-asterisk-17-debian-buster
+FROM epandi-nodejs-10-debian-latest AS epandi-asterisk-17-debian-stretch
 
 ### Set defaults
 ENV ASTERISK_VERSION=17.9.3 \
@@ -115,17 +118,17 @@ ENV ASTERISK_VERSION=17.9.3 \
 ### Pin libxml2 packages to Debian repositories
 RUN c_rehash && \
     echo "Package: libxml2*" > /etc/apt/preferences.d/libxml2 && \
-    echo "Pin: release o=Debian,n=buster" >> /etc/apt/preferences.d/libxml2 && \
+    echo "Pin: release o=Debian,n=stretch" >> /etc/apt/preferences.d/libxml2 && \
     echo "Pin-Priority: 501" >> /etc/apt/preferences.d/libxml2 && \
     APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=TRUE && \
     \
 ### Install dependencies
     set -x && \
-    echo "deb http://archive.debian.org/debian/ buster-backports main" > /etc/apt/sources.list.d/backports.list && \
-    echo "deb-src http://archive.debian.org/debian/ buster-backports main" >> /etc/apt/sources.list.d/backports.list && \
+    echo "deb http://archive.debian.org/debian/ stretch-backports main" > /etc/apt/sources.list.d/backports.list && \
+    echo "deb-src http://archive.debian.org/debian/ stretch-backports main" >> /etc/apt/sources.list.d/backports.list && \
     wget https://archive.raspbian.org/raspbian.public.key -O - | sudo apt-key add - && \
-    echo "deb http://archive.raspbian.org/raspbian buster main contrib non-free" >>/etc/apt/sources.list && \
-    echo "deb-src http://archive.raspbian.org/raspbian buster main contrib non-free" >>/etc/apt/sources.list && \
+    echo "deb http://archive.raspbian.org/raspbian stretch main contrib non-free" >>/etc/apt/sources.list && \
+    echo "deb-src http://archive.raspbian.org/raspbian stretch main contrib non-free" >>/etc/apt/sources.list && \
     apt-get update && \
     apt-get -o Dpkg::Options::="--force-confold" upgrade -y && \
     \
