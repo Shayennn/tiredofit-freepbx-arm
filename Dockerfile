@@ -43,7 +43,7 @@ RUN set -x && \
             vim-tiny \
             wget \
             && \
-    wget https://repo.zabbix.com/zabbix/5.2/raspbian/pool/main/z/zabbix-release/zabbix-release_5.2-1+debian$(cut -d"." -f1 /etc/debian_version)_all.deb && \
+    wget https://repo.zabbix.com/zabbix/5.2/$(if [ "$(dpkg --print-architecture)" = *"arm"* ]; then echo "raspbian"; else echo "debian"; fi)/pool/main/z/zabbix-release/zabbix-release_5.2-1+debian$(cut -d"." -f1 /etc/debian_version)_all.deb && \
     dpkg -i zabbix-release_5.2-1+debian$(cut -d"." -f1 /etc/debian_version)_all.deb && \
     apt-get update && \
     apt-get install -y --no-install-recommends \
@@ -124,17 +124,6 @@ RUN c_rehash && \
     echo "Pin: release o=Debian,n=stretch" >> /etc/apt/preferences.d/libxml2 && \
     echo "Pin-Priority: 501" >> /etc/apt/preferences.d/libxml2 && \
     APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=TRUE && \
-    \
-### Install dependencies
-    set -x && \
-    echo "deb http://archive.debian.org/debian/ stretch-backports main" > /etc/apt/sources.list.d/backports.list && \
-    echo "deb-src http://archive.debian.org/debian/ stretch-backports main" >> /etc/apt/sources.list.d/backports.list && \
-    wget https://archive.raspbian.org/raspbian.public.key -O - | sudo apt-key add - && \
-    echo "deb http://archive.raspbian.org/raspbian stretch main contrib non-free" >>/etc/apt/sources.list && \
-    echo "deb-src http://archive.raspbian.org/raspbian stretch main contrib non-free" >>/etc/apt/sources.list && \
-    apt-get update && \
-    apt-get -o Dpkg::Options::="--force-confold" upgrade -y && \
-    \
 ### Install development dependencies
     ASTERISK_BUILD_DEPS='\
                         autoconf \
