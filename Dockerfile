@@ -1,7 +1,7 @@
 FROM php:7.4-apache-bullseye AS epandi-debian-bullseye
 
 ### Set defaults
-ENV ZABBIX_VERSION=5.2 \
+ENV ZABBIX_VERSION=5.5 \
     S6_OVERLAY_VERSION=v2.2.0.3 \
     DEBUG_MODE=FALSE \
     TIMEZONE=Asia/Bangkok \
@@ -37,12 +37,12 @@ RUN set -x && \
             wget \
             && \
     # if arm in dpkg --print-architecture use raspbian, if not use debian
-    (wget https://repo.zabbix.com/zabbix/5.2/$(if [ "$(dpkg --print-architecture)" = *"arm"* ]; then echo "raspbian"; else echo "debian"; fi)/pool/main/z/zabbix-release/zabbix-release_5.2-1+debian9_all.deb) && \
-    dpkg -i zabbix-release_5.2-1+debian9_all.deb && \
-    rm -f zabbix-release_5.2-1+debian9_all.deb && \
+    (wget https://repo.zabbix.com/zabbix/5.5/$(if [ "$(dpkg --print-architecture)" = *"arm"* ]; then echo "raspbian"; else echo "debian"; fi)/pool/main/z/zabbix-release/zabbix-release_5.5-1+debian11_all.deb) && \
+    dpkg -i zabbix-release_5.5-1+debian11_all.deb && \
+    rm -f zabbix-release_5.5-1+debian11_all.deb && \
     apt-get update && \
     apt-get install -y --no-install-recommends \
-            libcurl3 zabbix-agent && \
+            libcurl4 zabbix-agent && \
     rm -rf /etc/zabbix/zabbix-agentd.conf.d/* && \
     curl -ksSLo /usr/local/bin/MailHog https://github.com/mailhog/MailHog/releases/download/v1.0.0/MailHog_linux_$(dpkg --print-architecture) && \
     curl -ksSLo /usr/local/bin/mhsendmail https://github.com/mailhog/mhsendmail/releases/download/v0.2.0/mhsendmail_linux_$(dpkg --print-architecture) && \
@@ -146,7 +146,7 @@ RUN c_rehash && \
                         libiksemel-dev \
                         libjansson-dev \
                         libldap2-dev \
-                        liblua5.2-dev \
+                        liblua5.5-dev \
                         libmariadb-dev \
                         libmariadbclient-dev \
                         libmp3lame-dev \
