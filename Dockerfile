@@ -181,8 +181,7 @@ RUN c_rehash && \
                         libvpb-dev \
                         libxml2-dev \
                         libxslt1-dev \
-                        # linux-headers-armmp \
-                        $(apt-cache search linux-headers-$(uname -r) | awk '{print $1}' | grep -m1 linux-headers) \
+                        linux-headers-$(uname -r) \
                         portaudio19-dev \
                         python-dev \
                         subversion \
