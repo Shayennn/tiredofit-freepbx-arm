@@ -188,8 +188,7 @@ RUN c_rehash && \
                         uuid-dev \
                         zlib1g-dev' && \
 ### Add linux-headers-$(uname -r) to ASTERISK_BUILD_DEPS
-    ASTERISK_BUILD_DEPS="$ASTERISK_BUILD_DEPS linux-headers-$(uname -r)" &&
-    \
+    ASTERISK_BUILD_DEPS="$ASTERISK_BUILD_DEPS linux-headers-$(uname -r)" && \
 ### Install runtime dependencies
     apt-get install --no-install-recommends -y \
                     $ASTERISK_BUILD_DEPS \
