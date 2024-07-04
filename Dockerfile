@@ -11,13 +11,6 @@ ENV ZABBIX_VERSION=5.2 \
     ENABLE_ZABBIX=TRUE \
     ZABBIX_HOSTNAME=debian.stretch
 
-### Change repositories to archive
-RUN sed -i 's/deb.debian.org/archive.debian.org/g' /etc/apt/sources.list && \
-    sed -i 's/security.debian.org/archive.debian.org/g' /etc/apt/sources.list
-
-### Change stretch-updates to stretch-backports
-RUN sed -i 's/stretch-updates/stretch-backports/g' /etc/apt/sources.list
-
 ### Dependencies addon
 RUN set -x && \
     apt-get update && \
