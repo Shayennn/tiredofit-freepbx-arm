@@ -68,7 +68,7 @@ RUN set -x && \
 EXPOSE 1025 8025 10050/TCP
 
 ### Add folders
-ADD debian-stretch/install /
+ADD debian-buster/install /
 
 ### Entrypoint configuration
 ENTRYPOINT ["/init"]
