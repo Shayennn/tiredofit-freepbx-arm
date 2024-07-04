@@ -1,6 +1,5 @@
 ###https://github.com/tiredofit/docker-debian/tree/buster
-FROM debian:buster AS epandi-debian-buster
-LABEL maintainer="Dave Conroy (dave at tiredofit dot ca)"
+FROM php:5.6-apache AS epandi-debian-buster
 
 ### Set defaults
 ENV ZABBIX_VERSION=5.2 \
@@ -38,17 +37,14 @@ RUN set -x && \
             vim-tiny \
             wget \
             && \
-### curl https://repo.zabbix.com/zabbix-official-repo.key | apt-key add - && \
-### echo "deb http://repo.zabbix.com/zabbix/${ZABBIX_VERSION}/debian buster main" >>/etc/apt/sources.list && \
-### echo "deb-src http://repo.zabbix.com/zabbix/${ZABBIX_VERSION}/debian buster main" >>/etc/apt/sources.list && \
     wget https://repo.zabbix.com/zabbix/5.2/raspbian/pool/main/z/zabbix-release/zabbix-release_5.2-1+debian$(cut -d"." -f1 /etc/debian_version)_all.deb && \
     dpkg -i zabbix-release_5.2-1+debian$(cut -d"." -f1 /etc/debian_version)_all.deb && \
     apt-get update && \
     apt-get install -y --no-install-recommends \
             zabbix-agent && \
     rm -rf /etc/zabbix/zabbix-agentd.conf.d/* && \
-    curl -ksSLo /usr/local/bin/MailHog https://github.com/mailhog/MailHog/releases/download/v1.0.0/MailHog_linux_arm && \
-    curl -ksSLo /usr/local/bin/mhsendmail https://github.com/mailhog/mhsendmail/releases/download/v0.2.0/mhsendmail_linux_arm && \
+    curl -ksSLo /usr/local/bin/MailHog https://github.com/mailhog/MailHog/releases/download/v1.0.0/MailHog_linux_$(dpkg --print-architecture) && \
+    curl -ksSLo /usr/local/bin/mhsendmail https://github.com/mailhog/mhsendmail/releases/download/v0.2.0/mhsendmail_linux_$(dpkg --print-architecture) && \
     chmod +x /usr/local/bin/MailHog && \
     chmod +x /usr/local/bin/mhsendmail && \
     useradd -r -s /bin/false -d /nonexistent mailhog && \
@@ -63,7 +59,7 @@ RUN set -x && \
     echo '%zabbix ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers && \
     \
 ### S6 installation
-    curl -ksSL https://github.com/just-containers/s6-overlay/releases/download/${S6_OVERLAY_VERSION}/s6-overlay-arm.tar.gz | tar xfz - --strip 0 -C /
+    curl -ksSL https://github.com/just-containers/s6-overlay/releases/download/${S6_OVERLAY_VERSION}/s6-overlay-$(dpkg --print-architecture).tar.gz | tar xfz - --strip 0 -C /
 
 ### Networking configuration
 EXPOSE 1025 8025 10050/TCP
@@ -103,9 +99,7 @@ RUN adduser --home /app --gecos "Node User" --disabled-password nodejs && \
 
 
 
-###https://github.com/tiredofit/docker-freepbx
-FROM epandi-nodejs-10-debian-latest
-LABEL maintainer="Dave Conroy (dave at tiredofit dot ca)"
+FROM epandi-nodejs-10-debian-latest as epandi-asterisk-17-debian-buster
 
 ### Set defaults
 ENV ASTERISK_VERSION=17.9.3 \
@@ -128,10 +122,6 @@ RUN c_rehash && \
     \
 ### Install dependencies
     set -x && \
-    # curl https://packages.sury.org/php/apt.gpg | apt-key add - && \
-    # echo "deb https://packages.sury.org/php/ buster main" > /etc/apt/sources.list.d/deb.sury.org.list && \
-#    curl https://www.mongodb.org/static/pgp/server-${MONGODB_VERSION}.asc | apt-key add - && \
-#    echo "deb http://repo.mongodb.org/apt/debian buster/mongodb-org/${MONGODB_VERSION} main" > /etc/apt/sources.list.d/mongodb-org.list && \
     echo "deb http://archive.debian.org/debian/ buster-backports main" > /etc/apt/sources.list.d/backports.list && \
     echo "deb-src http://archive.debian.org/debian/ buster-backports main" >> /etc/apt/sources.list.d/backports.list && \
     wget https://archive.raspbian.org/raspbian.public.key -O - | sudo apt-key add - && \
@@ -195,7 +185,8 @@ RUN c_rehash && \
                         libvpb-dev \
                         libxml2-dev \
                         libxslt1-dev \
-                        linux-headers-armmp \
+                        # linux-headers-armmp \
+                        $(apt-cache search linux-headers-$(uname -r) | awk '{print $1}' | grep -m1 linux-headers) \
                         portaudio19-dev \
                         python-dev \
                         subversion \
@@ -244,19 +235,6 @@ RUN c_rehash && \
                     mongodb \
                     mpg123 \
                     patch \
-                    # php${PHP_VERSION} \
-                    # php${PHP_VERSION}-curl \
-                    # php${PHP_VERSION}-cli \
-                    # php${PHP_VERSION}-mysql \
-                    # php${PHP_VERSION}-gd \
-                    # php${PHP_VERSION}-mbstring \
-                    # php${PHP_VERSION}-intl \
-                    # php${PHP_VERSION}-bcmath \
-                    # php${PHP_VERSION}-ldap \
-                    # php${PHP_VERSION}-xml \
-                    # php${PHP_VERSION}-zip \
-                    # php${PHP_VERSION}-sqlite3 \
-                    # php-pear \
                     pkg-config \
                     re2c \
                     sipsak \
@@ -287,7 +265,7 @@ RUN addgroup --gid 2600 asterisk && \
     mkdir build && \
     cd build && \
     cmake ../ -LH -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local -DWITH_SSL=OPENSSL\
-    -DDM_DIR=/usr/lib/arm-linux-gnueabihf -DCMAKE_C_FLAGS_RELEASE:STRING="-w" && \
+    -DDM_DIR=/usr/lib/$(dpkg-architecture -qDEB_HOST_MULTIARCH) -DCMAKE_C_FLAGS_RELEASE:STRING="-w" && \
     cmake --build . --config Release && \
     make install && \
     \
@@ -297,83 +275,6 @@ RUN addgroup --gid 2600 asterisk && \
     cd /usr/src/spandsp && \
     ./configure --prefix=/usr && \
     make && \
-    make install
-
-COPY freetype.patch /tmp
-
-RUN cd /usr/src && \
-    git clone https://github.com/php/php-src.git --depth 1 --branch php-${PHP_VERSION} && \
-    cd php-src && \
-    patch -p1 -i /tmp/freetype.patch && \
-    rm -f /tmp/freetype.patch && \
-    apt install -y libssl1.0-dev libssl1.0.2 libldb-dev librecode-dev libsasl2-dev libldap2-dev libxml2-dev libgmp-dev libbz2-dev libt1-dev libcurl4-gnutls-dev libjpeg-dev libpng-dev libxpm-dev libfreetype6-dev libgmp-dev libldap2-dev libmcrypt-dev libmhash-dev unixodbc-dev libpspell-dev libtidy-dev libxslt1-dev libzip-dev libvpx-dev && \
-    ln -s /usr/include/$(dpkg-architecture -qDEB_HOST_MULTIARCH)/curl /usr/include/curl && \
-    ln -s /usr/include/$(dpkg-architecture -qDEB_HOST_MULTIARCH)/gmp.h /usr/include/gmp.h && \
-    ln -s /usr/lib/$(dpkg-architecture -qDEB_HOST_MULTIARCH)/libldap.so /usr/lib/libldap.so && \
-    ln -s /usr/lib/$(dpkg-architecture -qDEB_HOST_MULTIARCH)/liblber.so /usr/lib/liblber.so && \
-    # obdc fix
-    ln -s /usr/lib/$(dpkg-architecture -qDEB_HOST_MULTIARCH)/libodbc.so /usr/lib/libodbc.so && \
-    ./buildconf --force && \
-    ./configure --prefix=/usr \
-        --with-config-file-path=/etc/php/${PHP_VERSION}/apache2 \
-        --with-config-file-scan-dir=/etc/php/${PHP_VERSION}/apache2/conf.d \
-        --enable-mbstring \
-        --enable-zip \
-        --enable-bcmath \
-        --enable-pcntl \
-        --enable-ftp \
-        --enable-exif \
-        --enable-calendar \
-        --enable-sysvmsg \
-        --enable-sysvsem \
-        --enable-sysvshm \
-        --enable-wddx \
-        --with-curl \
-        --with-mcrypt \
-        --with-iconv \
-        --with-gmp \
-        --with-pspell \
-        --with-gd \
-        --with-jpeg-dir=/usr \
-        --with-png-dir=/usr \
-        --with-zlib-dir=/usr \
-        --with-xpm-dir=/usr \
-        --with-freetype-dir=/usr \
-        --with-t1lib=/usr \
-        --enable-gd-native-ttf \
-        --enable-gd-jis-conv \
-        --with-openssl \
-        --with-openssl-dir=/usr/local/openssl-1.0 \
-        --with-mhash \
-        --enable-pdo \
-        --with-pdo-mysql \
-        --with-gettext \
-        --with-zlib \
-        --with-bz2 \
-        --with-recode \
-        --enable-soap \
-        --with-xmlrpc \
-        --with-tidy \
-        --with-mysqli \
-        --with-mysql-sock=/var/run/mysqld/mysqld.sock \
-        --with-pear \
-        --enable-sockets \
-        --enable-shmop \
-        --enable-mbregex \
-        --with-mysqli=mysqlnd \
-        --with-pdo-mysql=mysqlnd \
-        --enable-embedded-mysqli \
-        --with-ldap \
-        --with-ldap-sasl \
-        --with-sqlite3 \
-        --with-pdo-sqlite \
-        --with-xsl \
-        --with-zip \
-        --with-kerberos \
-        --with-vpx-dir=/usr \
-        --with-c \
-        --enable-opcache=no && \
-    make -j $(nproc) && \
     make install
 
 ### Build Asterisk
@@ -444,7 +345,8 @@ RUN cd /usr/src && \
     curl https://bitbucket.org/arkadi/asterisk-g72x/get/master.tar.gz | tar xvfz - --strip 1 -C /usr/src/asterisk-g72x && \
     cd /usr/src/asterisk-g72x && \
     ./autogen.sh && \
-    ./configure CFLAGS='-march=armv7' --prefix=/usr --with-bcg729 --enable-$G72X_CPUHOST && \
+    # ./configure CFLAGS='-march=armv7' --prefix=/usr --with-bcg729 --enable-$G72X_CPUHOST && \
+    ./configure --prefix=/usr --with-bcg729 --enable-$G72X_CPUHOST && \
     make && \
     make install
 #### Add USB Dongle support
@@ -470,8 +372,8 @@ RUN mkdir -p /var/run/fail2ban && \
     rm -rf /var/lib/apt/lists/* && \
     \
 ### FreePBX hacks
-    sed -i -e "s/memory_limit = 128M/memory_limit = 256M/g" /etc/php/${PHP_VERSION}/apache2/php.ini && \
-    sed -i 's/\(^upload_max_filesize = \).*/\120M/' /etc/php/${PHP_VERSION}/apache2/php.ini && \
+    sed -i -e "s/memory_limit = 128M/memory_limit = 256M/g" /usr/local/etc/php/conf.d/php.ini && \
+    sed -i 's/\(^upload_max_filesize = \).*/\120M/' /usr/local/etc/php/conf.d/php.ini && \
     a2disconf other-vhosts-access-log.conf && \
     a2enmod rewrite && \
     a2enmod headers && \
