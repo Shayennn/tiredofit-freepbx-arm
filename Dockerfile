@@ -13,7 +13,7 @@ ENV ZABBIX_VERSION=5.2 \
 
 ### Change all repositories to archive
 RUN sed -i 's/deb.debian.org/archive.debian.org/g' /etc/apt/sources.list && \
-    sed -i 's/security.debian.org/archive.debian.org/g' /etc/apt/sources.list && \
+    sed -i 's/security.debian.org/archive.debian.org/g' /etc/apt/sources.list
 
 ### Dependencies addon
 RUN set -x && \
