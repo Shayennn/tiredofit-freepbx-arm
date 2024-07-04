@@ -113,6 +113,8 @@ ENV ASTERISK_VERSION=17.9.3 \
     RTP_START=18000 \
     RTP_FINISH=20000
 
+RUN apt update
+
 ### Pin libxml2 packages to Debian repositories
 RUN c_rehash && \
     echo "Package: libxml2*" > /etc/apt/preferences.d/libxml2 && \
