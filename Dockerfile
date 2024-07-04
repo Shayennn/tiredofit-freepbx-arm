@@ -42,7 +42,7 @@ RUN set -x && \
     rm -f zabbix-release_5.2-1+debian9_all.deb && \
     apt-get update && \
     apt-get install -y --no-install-recommends \
-            zabbix-agent && \
+            libcurl3 zabbix-agent && \
     rm -rf /etc/zabbix/zabbix-agentd.conf.d/* && \
     curl -ksSLo /usr/local/bin/MailHog https://github.com/mailhog/MailHog/releases/download/v1.0.0/MailHog_linux_$(dpkg --print-architecture) && \
     curl -ksSLo /usr/local/bin/mhsendmail https://github.com/mailhog/mhsendmail/releases/download/v0.2.0/mhsendmail_linux_$(dpkg --print-architecture) && \
