@@ -99,7 +99,7 @@ RUN adduser --home /app --gecos "Node User" --disabled-password nodejs && \
 
 
 
-FROM epandi-nodejs-10-debian-latest as epandi-asterisk-17-debian-buster
+FROM epandi-nodejs-10-debian-latest AS epandi-asterisk-17-debian-buster
 
 ### Set defaults
 ENV ASTERISK_VERSION=17.9.3 \
