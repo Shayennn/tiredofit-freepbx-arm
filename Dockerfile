@@ -108,7 +108,6 @@ ENV ASTERISK_VERSION=17.9.3 \
     G72X_CPUHOST=penryn \
     G72X_VERSION=0.1 \
     MONGODB_VERSION=4.2 \
-    PHP_VERSION=5.6.40 \
     SPANDSP_VERSION=20180108 \
     RTP_START=18000 \
     RTP_FINISH=20000
@@ -197,7 +196,6 @@ RUN c_rehash && \
 ### Install runtime dependencies
     apt-get install --no-install-recommends -y \
                     $ASTERISK_BUILD_DEPS \
-                    apache2 \
                     composer \
                     fail2ban \
                     ffmpeg \
