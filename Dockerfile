@@ -1,4 +1,4 @@
-FROM php:5.6-apache-stretch AS epandi-debian-stretch
+FROM php:7.4-apache-bullseye AS epandi-debian-stretch
 
 ### Set defaults
 ENV ZABBIX_VERSION=5.2 \
