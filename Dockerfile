@@ -11,9 +11,9 @@ ENV ZABBIX_VERSION=5.2 \
     ENABLE_ZABBIX=TRUE \
     ZABBIX_HOSTNAME=debian.stretch
 
-### Fix Err:10 http://security.debian.org/debian-security stretch/updates/main amd64 Packages
-### By remove http://security.debian.org/debian-security
-RUN sed -i '/security.debian.org/d' /etc/apt/sources.list
+### Change all repositories to archive
+RUN sed -i 's/deb.debian.org/archive.debian.org/g' /etc/apt/sources.list && \
+    sed -i 's/security.debian.org/archive.debian.org/g' /etc/apt/sources.list && \
 
 ### Dependencies addon
 RUN set -x && \
