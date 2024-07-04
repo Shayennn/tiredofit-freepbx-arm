@@ -44,7 +44,7 @@ RUN set -x && \
             wget \
             && \
     # if arm in dpkg --print-architecture use raspbian, if not use debian
-    wget https://repo.zabbix.com/zabbix/5.2/$(if [ "$(dpkg --print-architecture)" = *"arm"* ]; then echo "raspbian"; else echo "debian"; fi)/pool/main/z/zabbix-release/zabbix-release_5.2-1+debian9_all.deb && \
+    (wget https://repo.zabbix.com/zabbix/5.2/$(if [ "$(dpkg --print-architecture)" = *"arm"* ]; then echo "raspbian"; else echo "debian"; fi)/pool/main/z/zabbix-release/zabbix-release_5.2-1+debian9_all.deb) && \
     dpkg -i zabbix-release_5.2-1+debian9_all.deb && \
     rm -f zabbix-release_5.2-1+debian9_all.deb && \
     apt-get update && \
