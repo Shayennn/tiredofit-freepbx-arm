@@ -181,13 +181,14 @@ RUN c_rehash && \
                         libvpb-dev \
                         libxml2-dev \
                         libxslt1-dev \
-                        linux-headers-$(uname -r) \
                         portaudio19-dev \
                         python-dev \
                         subversion \
                         unixodbc-dev \
                         uuid-dev \
                         zlib1g-dev' && \
+### Add linux-headers-$(uname -r) to ASTERISK_BUILD_DEPS
+    ASTERISK_BUILD_DEPS="$ASTERISK_BUILD_DEPS linux-headers-$(uname -r)" &&
     \
 ### Install runtime dependencies
     apt-get install --no-install-recommends -y \
